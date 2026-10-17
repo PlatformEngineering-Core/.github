@@ -137,7 +137,7 @@ O portal tem identidade OIDC própria e autenticação de usuários via Easy Aut
 
 ## Conceitos-chave
 
-- **Sem credenciais de longa duração**: GitHub Actions → Azure via OIDC com Federated Identity Credentials imutáveis (`org@ID`/`repo@ID`); SWA → Entra via Managed Identity + FIC; ACA → ACR via identidade `SystemAssigned` (pull sem senha). Explicação completa: [iDPw → O que são MI e FIC](https://github.com/PlatformEngineering-Core/iDPw#o-que-s%C3%A3o-mi-e-fic-e-por-que-n%C3%A3o-h%C3%A1-client-secret).
+- **Sem credenciais de longa duração**: GitHub Actions → Azure via OIDC com Federated Identity Credentials imutáveis (`org@ID`/`repo@ID`); SWA → Entra via Managed Identity + FIC; ACA → ACR via admin user do registry (credencial estática, sem Managed Identity). Explicação completa: [iDPw → O que são MI e FIC](https://github.com/PlatformEngineering-Core/iDPw#o-que-s%C3%A3o-mi-e-fic-e-por-que-n%C3%A3o-h%C3%A1-client-secret).
 - **ACR é o único container registry**: um ACR compartilhado **por empresa** (criado no job `terraform-azure-shared-cross-infra`), com build remoto via `az acr build` (sem Docker daemon no runner).
 - **Infra compartilhada em dois níveis**: cross-env (ACR, por empresa) e por ambiente (RG/Logs/ACAE/Key Vault, por área + `-dev`/`-hom`/prd). Detalhes: [platform-enablement → Infraestrutura compartilhada](https://github.com/PlatformEngineering-Core/platform-enablement#infraestrutura-compartilhada-por-%C3%A1rea-iac-shared-e-iac-shared-cross).
 - **Rastreabilidade**: toda solicitação do portal gera um `control_id` (`REQ-AAAAMMDD-XXXXXXXX`) que aparece no nome da execução do workflow — [iDPw → Rastreamento](https://github.com/PlatformEngineering-Core/iDPw#rastreamento-das-solicita%C3%A7%C3%B5es).
