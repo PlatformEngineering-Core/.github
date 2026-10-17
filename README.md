@@ -88,7 +88,7 @@ flowchart TB
 | [iDPw](https://github.com/PlatformEngineering-Core/iDPw) | Portal web (React/Vite em Azure Static Web App) que dispara os workflows de create/destroy/recreate via API do GitHub. Login com GitHub + Microsoft (Easy Auth, role `idp_user`). | [README](https://github.com/PlatformEngineering-Core/iDPw#readme) — setup local, Easy Auth, MI/FIC, convites de usuário, CI/CD |
 | [platform-enablement](https://github.com/PlatformEngineering-Core/platform-enablement) | Orquestrador: workflows `terraform-create/destroy/recreate` que criam repo, branches, scaffold, SonarCloud, App Registration (OIDC), RGs, ACR compartilhado e infra do deploy target. | [README](https://github.com/PlatformEngineering-Core/platform-enablement#readme) — pré-requisitos, secrets, estrutura dos estados Terraform, infra compartilhada |
 | [gh-actions](https://github.com/PlatformEngineering-Core/gh-actions) | Workflows reutilizáveis e composite actions de build/test/segurança/deploy por stack (.NET, Java, Node, Python, React), chamados pelos repos criados. | [README](https://github.com/PlatformEngineering-Core/gh-actions#readme) — contratos (inputs/secrets) de cada workflow |
-| [gh-runners](https://github.com/PlatformEngineering-Core/gh-runners) | Runners efêmeros self-hosted por stack (`dotnet`, `java`, `node`, `python`) rodando como **Azure Container Apps Jobs** com scale-to-zero via KEDA. | [README](https://github.com/PlatformEngineering-Core/gh-runners#readme) e [docs/GITHUB-APP-SETUP.md](https://github.com/PlatformEngineering-Core/gh-runners/blob/main/docs/GITHUB-APP-SETUP.md) |
+| [gh-runners](https://github.com/PlatformEngineering-Core/gh-runners) | Runners efêmeros self-hosted por stack (`dotnet`, `java`, `node`, `python`) rodando como **Azure Container Apps Jobs** com scale-to-zero via KEDA — mais o runner `platform` (org Core) que executa os próprios workflows do platform-enablement. | [README](https://github.com/PlatformEngineering-Core/gh-runners#readme) e [docs/GITHUB-APP-SETUP.md](https://github.com/PlatformEngineering-Core/gh-runners/blob/main/docs/GITHUB-APP-SETUP.md) |
 
 ---
 
@@ -112,7 +112,7 @@ Todos os `tfstate` e tfplans ficam em blobs de um Storage Account (por repo e po
 
 ### 3. Runners self-hosted (Azure Container Apps Jobs)
 
-Os pipelines de build/deploy dos repos criados rodam em runners efêmeros (`runs-on: [self-hosted, <stack>]`), escalados do zero pelo KEDA a cada webhook do GitHub.
+Os pipelines de build/deploy dos repos criados rodam em runners efêmeros (`runs-on: [self-hosted, <stack>]`), escalados do zero pelo KEDA a cada webhook do GitHub. Os próprios workflows de provisionamento (platform-enablement) rodam no runner `platform`, registrado na org Core.
 
 - Setup do GitHub App e dos Jobs: [gh-runners → docs/GITHUB-APP-SETUP.md](https://github.com/PlatformEngineering-Core/gh-runners/blob/main/docs/GITHUB-APP-SETUP.md)
 - Arquitetura e entrypoint: [gh-runners → README](https://github.com/PlatformEngineering-Core/gh-runners#readme)
