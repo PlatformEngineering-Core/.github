@@ -13,39 +13,70 @@ Este repositório (`.github`) guarda a apresentação e o mapa da plataforma. **
 ## Visão geral
 
 ```mermaid
-flowchart LR
-    subgraph Portal
-        IDPw[iDPw — Static Web App<br/>React + Easy Auth]
+flowchart TB
+    PORTAL[iDPw — portal<br/>dispatch via GitHub API]
+
+    subgraph GITHUB[GitHub — org PlatformEngineering-Apps]
+        REPO[Repositório<br/>scaffold + templates de CI/CD]
+        LABELS[Labels de issues]
+        ENVS[Environments<br/>development, staging, production]
+        SECRETS[Actions secrets<br/>OIDC, Sonar, Gitleaks, Snyk/Safety]
+        VARS[Actions variables<br/>CONTAINER_REGISTRY, RG, ACAE, build]
+        BRANCHES[Branches<br/>development e staging]
+        ACTIONS[GitHub Actions<br/>workflows do gh-actions]
+
+        REPO --> LABELS
+        REPO --> ENVS
+        REPO --> SECRETS
+        REPO --> VARS
+        REPO --> BRANCHES
+        SECRETS --> ACTIONS
+        VARS --> ACTIONS
     end
 
-    subgraph Core["Org: PlatformEngineering-Core"]
-        PE[platform-enablement<br/>workflows Terraform]
-        GA[gh-actions<br/>workflows reutilizáveis<br/>build/deploy/security]
-        GR[gh-runners<br/>runners self-hosted<br/>em ACA Jobs + KEDA]
+    subgraph AZURE[Azure]
+        subgraph ENTRA[Microsoft Entra ID]
+            APP[App Registration por repo]
+            SP[Service Principal]
+            OIDC[FICs imutáveis<br/>org@ID + repo@ID]
+            APP --> SP
+            APP --> OIDC
+        end
+
+        subgraph CROSS[Shared cross-env — por empresa]
+            ACR[ACR compartilhado<br/>admin desabilitado]
+        end
+
+        subgraph SHARED[Shared por ambiente — por área]
+            RGS[RG compartilhado]
+            ACAE[Container Apps Environment<br/>Consumption]
+            LAW[Log Analytics + App Insights]
+            KV[Key Vault opcional]
+        end
+
+        subgraph REPRG[Resource Group do repo]
+            CA[Container App<br/>identidade SystemAssigned<br/>1 a 5 réplicas]
+        end
+
+        ROLES[5 roles no ACR<br/>Push, Pull, Delete, Tasks, Import]
+        ROLECONTRIB[Contributor no RG do repo]
     end
 
-    subgraph Apps["Org: PlatformEngineering-Apps"]
-        REPO[Repos das aplicações<br/>criados pela plataforma]
-    end
+    PORTAL -->|workflow_dispatch| TF[Terraform — platform-enablement]
+    TF --> REPO
+    TF --> APP
+    TF --> CROSS
+    TF --> SHARED
+    TF --> REPRG
 
-    subgraph Azure
-        ST[(Storage Account<br/>estados Terraform)]
-        ACR[(ACR compartilhado<br/>por empresa)]
-        RG[Resource Groups<br/>compartilhados por área]
-        ACAE[Container Apps Env<br/>+ Jobs runners]
-        APP[App Registration<br/>OIDC/FIC por repo]
-    end
-
-    IDPw -- "dispatch (GitHub API)" --> PE
-    PE -- "cria repo + secrets + IaC" --> REPO
-    PE --> ST
-    PE --> ACR
-    PE --> RG
-    PE --> APP
-    REPO -- "chama workflows reutilizáveis" --> GA
-    GA -- "runs-on: self-hosted" --> GR
-    GR --> ACAE
-    GA -- "build/push imagem" --> ACR
+    ACTIONS -->|OIDC sem secret| OIDC
+    OIDC --> SP
+    SP --> ROLECONTRIB --> REPRG
+    SP --> ROLES --> ACR
+    ACTIONS -->|az acr build remoto| ACR
+    ACR -->|pull via SystemAssigned| CA
+    LAW -->|connection string como secret| CA
+    CA -->|logs e telemetria| LAW
 ```
 
 ---
