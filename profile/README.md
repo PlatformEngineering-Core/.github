@@ -129,6 +129,19 @@ Secrets por empresa (GitHub Environment), incluindo `AZURE_CREDENTIALS`, SAS tok
 
 O portal tem identidade OIDC própria e autenticação de usuários via Easy Auth — ambos **sem secrets de longa duração** (Managed Identity + FIC para o provedor Microsoft; o único secret real é o do GitHub OAuth App).
 
+### Mapa de tokens (GitHub PATs)
+
+A plataforma usa poucos PATs, cada um com o menor escopo possível:
+
+| Secret | Onde vive | Tipo / owner | Para quê |
+| --- | --- | --- | --- |
+| `GH_PAT_APPS` | repo gh-runners | fine-grained, owner **Apps** | scaler + registro dos 4 runners de stack |
+| `GH_PAT_CORE` | repo gh-runners | fine-grained, owner **Core** | runner `platform` (fine-grained não atravessa org) |
+| `GHCR_PAT` | repo gh-runners | classic, `read/write:packages` | pull/push das imagens de runner no GHCR |
+| `TF_VAR_GITHUB_TOKEN` | environment no platform-enablement | classic, `repo`+`workflow`+`admin:org` | criar repos na org Apps + gerenciar environments/secrets do próprio repo (copy-environment) |
+
+> Detalhes de criação/rotação de cada um: [gh-runners → segurança dos tokens](https://github.com/PlatformEngineering-Core/gh-runners#importante-seguran%C3%A7a-dos-tokens) e [platform-enablement → secrets](https://github.com/PlatformEngineering-Core/platform-enablement#secrets-dos-workflows).
+
 - Bootstrap da identidade OIDC do repo: [`scripts/New-OidcIdentity.ps1`](https://github.com/PlatformEngineering-Core/iDPw/blob/main/scripts/New-OidcIdentity.ps1)
 - Registro dos provedores de login, MI/FIC e convites de usuário (role `idp_user`): [iDPw → Acesso](https://github.com/PlatformEngineering-Core/iDPw#acesso)
 - CI/CD (cria RG + SWA se não existirem, aplica app settings e publica): [iDPw → CI/CD](https://github.com/PlatformEngineering-Core/iDPw#cicd)
