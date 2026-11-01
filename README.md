@@ -100,7 +100,7 @@ Tudo que precisa existir **antes** de a plataforma provisionar o primeiro reposi
 
 Identidade que os workflows do `platform-enablement` usam para criar RGs, App Registrations e atribuir roles no Azure.
 
-- Script: [`scripts/New-TerraformInfrastructureServicePrincipal.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/New-TerraformInfrastructureServicePrincipal.ps1)
+- Script: [`scripts/01-New-TerraformInfrastructureServicePrincipal.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/01-New-TerraformInfrastructureServicePrincipal.ps1)
 - Detalhes: [platform-enablement → Pré-requisitos §1](https://github.com/PlatformEngineering-Core/platform-enablement#1-service-principal-no-microsoft-entra-id)
 
 ### 2. Storage Account para os estados do Terraform
@@ -121,7 +121,7 @@ Os pipelines de build/deploy dos repos criados rodam em runners efêmeros (`runs
 
 Secrets por empresa (GitHub Environment), incluindo `AZURE_CREDENTIALS`, SAS token do storage, PAT com escopo de criação de repos (`GH_PE_CROSS_TERRAFORM`) e tokens SonarCloud/Gitleaks/etc.
 
-- Script interativo: [`scripts/New-EnvAndSecretsByCompany.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/New-EnvAndSecretsByCompany.ps1)
+- Script interativo: [`scripts/02-New-EnvAndSecretsByCompany.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/02-New-EnvAndSecretsByCompany.ps1)
 - Tabela completa de secrets: [platform-enablement → Secrets dos workflows](https://github.com/PlatformEngineering-Core/platform-enablement#secrets-dos-workflows)
 - Copiar um environment inteiro (regras, variables e secrets) para outro nome: workflow **Copy GitHub Environment** (`copy-environment.yml`) no platform-enablement.
 
@@ -131,7 +131,7 @@ O portal tem identidade OIDC própria e autenticação de usuários via Easy Aut
 
 ### Mapa de tokens (GitHub PATs)
 
-A plataforma usa poucos tokens, cada um com o menor escopo possível. Convenção de nome: **`PE-<ORG>-<FINALIDADE>`** (`CROSS` = classic, quando fine-grained não atravessa org/não cobre o escopo). A remontagem padronizada é aplicada por [`Set-PlatformSecrets.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/Set-PlatformSecrets.ps1).
+A plataforma usa poucos tokens, cada um com o menor escopo possível. Convenção de nome: **`PE-<ORG>-<FINALIDADE>`** (`CROSS` = classic, quando fine-grained não atravessa org/não cobre o escopo). A remontagem padronizada é aplicada por [`91-Set-PlatformSecrets.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/91-Set-PlatformSecrets.ps1).
 
 | Token (GitHub) | Vira secret | Onde | Tipo / owner | Escopos / permissões | Para quê |
 | --- | --- | --- | --- | --- | --- |
