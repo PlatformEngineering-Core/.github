@@ -119,7 +119,7 @@ Os pipelines de build/deploy dos repos criados rodam em runners efêmeros (`runs
 
 ### 4. Secrets e Environments do platform-enablement
 
-Secrets por empresa (GitHub Environment), incluindo `AZURE_CREDENTIALS`, SAS token do storage, PAT com escopo de criação de repos (`TF_VAR_GITHUB_TOKEN`) e tokens SonarCloud/Gitleaks/etc.
+Secrets por empresa (GitHub Environment), incluindo `AZURE_CREDENTIALS`, SAS token do storage, PAT com escopo de criação de repos (`GH_PE_CROSS_TERRAFORM`) e tokens SonarCloud/Gitleaks/etc.
 
 - Script interativo: [`scripts/New-EnvAndSecretsByCompany.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/New-EnvAndSecretsByCompany.ps1)
 - Tabela completa de secrets: [platform-enablement → Secrets dos workflows](https://github.com/PlatformEngineering-Core/platform-enablement#secrets-dos-workflows)
@@ -131,14 +131,18 @@ O portal tem identidade OIDC própria e autenticação de usuários via Easy Aut
 
 ### Mapa de tokens (GitHub PATs)
 
-A plataforma usa poucos PATs, cada um com o menor escopo possível:
+A plataforma usa poucos tokens, cada um com o menor escopo possível. Convenção de nome: **`PE-<ORG>-<FINALIDADE>`** (`CROSS` = classic, quando fine-grained não atravessa org/não cobre o escopo). A remontagem padronizada é aplicada por [`Set-PlatformSecrets.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/Set-PlatformSecrets.ps1).
 
-| Secret | Onde vive | Tipo / owner | Para quê |
-| --- | --- | --- | --- |
-| `GH_PAT_APPS` | repo gh-runners | fine-grained, owner **Apps** | scaler + registro dos 4 runners de stack |
-| `GH_PAT_CORE` | repo gh-runners | fine-grained, owner **Core** | runner `platform` (fine-grained não atravessa org) |
-| `GHCR_PAT` | repo gh-runners | classic, `read/write:packages` | pull/push das imagens de runner no GHCR |
-| `TF_VAR_GITHUB_TOKEN` | environment no platform-enablement | classic, `repo`+`workflow`+`admin:org` | criar repos na org Apps + gerenciar environments/secrets do próprio repo (copy-environment) |
+| Token (GitHub) | Vira secret | Onde | Tipo / owner | Escopos / permissões | Para quê |
+| --- | --- | --- | --- | --- | --- |
+| `PE-APPS-RUNNERS` | `GH_PE_APPS_RUNNERS` | repo gh-runners | fine-grained, owner **Apps** | org Apps: **Self-hosted runners RW** · repos: todos | scaler + registro dos 4 runners de stack |
+| `PE-CORE-RUNNERS` | `GH_PE_CORE_RUNNERS` | repo gh-runners | fine-grained, owner **Core** | org Core: **Self-hosted runners RW** · repos: todos | runner `platform` (fine-grained não atravessa org) |
+| `PE-CROSS-GHCR` | `GH_PE_CROSS_GHCR` / `ghcr-password` | repos gh-runners, iDPw-backend + ACAs | classic | `read:packages` + `write:packages` | pull/push das imagens no GHCR |
+| `PE-CROSS-TERRAFORM` | `GH_PE_CROSS_TERRAFORM` | environments no platform-enablement | classic | `repo` + `workflow` + `admin:org` + `delete_repo` | criar/deletar repos na org Apps, environments, secrets/vars, FICs, dispatch |
+| `PE-APPS-MIRROR-SYNC` | `GH_TOKEN` | repo gh-actions | fine-grained, owner **Apps** | **Contents RW** + Metadata R · repo: só `gh-actions` | Sync-Mirror (push no mirror Apps/gh-actions) |
+| *(GitHub App `iDPw-backend`)* | `GH_APP_ID` + `GH_APP_PRIVATE_KEY` | repo iDPw-backend → ACA | App instalado nas 2 orgs | App: Actions RW, Contents R, Environments R, Secrets R (só metadados), Variables R, Metadata R · instalação Core: só `platform-enablement` · instalação Apps: todos | backend do portal (dispatch na Core + leituras na Apps) — [guia](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md) |
+
+> Aposentados na padronização de 2026-10-31: `GH_PE_AUTH` (sem uso), `tf-create-repo` (→ `PE-CROSS-TERRAFORM`), `PE_GHCR_PAT` (→ `PE-CROSS-GHCR`), `iDPw-backend` PAT (→ GitHub App).
 
 > Detalhes de criação/rotação de cada um: [gh-runners → segurança dos tokens](https://github.com/PlatformEngineering-Core/gh-runners#importante-seguran%C3%A7a-dos-tokens) e [platform-enablement → secrets](https://github.com/PlatformEngineering-Core/platform-enablement#secrets-dos-workflows).
 
