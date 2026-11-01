@@ -142,8 +142,6 @@ A plataforma usa poucos tokens, cada um com o menor escopo possível. Convençã
 | `PE-APPS-MIRROR-SYNC` | `GH_TOKEN` | repo gh-actions | fine-grained, owner **Apps** | **Contents RW** + Metadata R · repo: só `gh-actions` | Sync-Mirror (push no mirror Apps/gh-actions) |
 | *(GitHub App `iDPw-backend`)* | `GH_APP_ID` + `GH_APP_PRIVATE_KEY` | repo iDPw-backend → ACA | App instalado nas 2 orgs | App: Actions RW, Contents R, Environments R, Secrets R (só metadados), Variables R, Metadata R · instalação Core: só `platform-enablement` · instalação Apps: todos | backend do portal (dispatch na Core + leituras na Apps) — [guia](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md) |
 
-> Aposentados na padronização de 2026-10-31: `GH_PE_AUTH` (sem uso), `tf-create-repo` (→ `PE-CROSS-TERRAFORM`), `PE_GHCR_PAT` (→ `PE-CROSS-GHCR`), `iDPw-backend` PAT (→ GitHub App).
-
 > Detalhes de criação/rotação de cada um: [gh-runners → segurança dos tokens](https://github.com/PlatformEngineering-Core/gh-runners#importante-seguran%C3%A7a-dos-tokens) e [platform-enablement → secrets](https://github.com/PlatformEngineering-Core/platform-enablement#secrets-dos-workflows).
 
 - Bootstrap da identidade OIDC do repo: [`scripts/New-OidcIdentity.ps1`](https://github.com/PlatformEngineering-Core/iDPw/blob/main/scripts/New-OidcIdentity.ps1)
