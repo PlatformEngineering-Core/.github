@@ -152,10 +152,10 @@ A plataforma usa poucos tokens, cada um com o menor escopo possível. Convençã
 
 | Repositório | Escopo | Secrets | Vars |
 | --- | --- | --- | --- |
-| `platform-enablement` | **Environment por company** (ex: `Mestrado-DEV`) | `AZURE_CREDENTIALS`, `AZURE_STORAGE_ACCOUNT_SAS_TOKEN`, `GH_PE_CROSS_TERRAFORM`, `TF_VAR_SONAR_TOKEN`, `TF_VAR_SNYK_API_KEY`, `TF_VAR_SAFETY_API_KEY`, `TF_VAR_GITLEAKS_LICENSE`, `TF_VAR_OTLP_*` (4, opcionais) | `GH_TARGET_APPS`, `IDPW_BACKEND_PRINCIPAL_ID` (opcional) |
+| `platform-enablement` | **Environment por company** (ex: `Mestrado-DEV`) | `AZURE_CREDENTIALS`, `AZURE_STORAGE_ACCOUNT_SAS_TOKEN`, `GH_PE_CROSS_TERRAFORM`, `TF_VAR_SONAR_TOKEN`, `TF_VAR_SNYK_API_KEY`, `TF_VAR_SAFETY_API_KEY`, `TF_VAR_GITLEAKS_LICENSE`, `TF_VAR_OTLP_*` (4, opcionais) | env: `GH_TARGET_APPS`, `IDPW_BACKEND_PRINCIPAL_ID` (opcional) · repo: `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_STORAGE_CONTAINER_NAME` |
 | `gh-runners` | repo | `AZURE_CREDENTIALS`, `GH_PE_APPS_RUNNERS`, `GH_PE_CORE_RUNNERS`, `GH_PE_CROSS_GHCR` | — |
 | `gh-actions` | repo | `GH_PE_APPS_MIRROR_SYNC` | — |
-| `iDPw-backend` | repo | `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` (OIDC), `GH_PE_CROSS_GHCR`, `GH_APP_PRIVATE_KEY`, `RAVENDB_CERTIFICATE_BASE64` | `GH_APP_ID`, `RAVENDB_URL` (+ defaults opcionais) |
+| `iDPw-backend` | repo | `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` (OIDC), `GH_PE_CROSS_GHCR`, `GH_APP_PRIVATE_KEY`, `RAVENDB_CERTIFICATE_BASE64` | obrigatórias: `GH_APP_ID`, `RAVENDB_URL`, `RAVENDB_DATABASE`, `GH_PLATFORM_REPO`, `GH_APPS_ORG`, `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_STORAGE_CONTAINER_NAME`, `AZURE_RESOURCE_GROUP`, `AZURE_ACA_ENVIRONMENT`, `AZURE_CONTAINERAPP_NAME`, `AZURE_LOCATION` · opcional: `GHCR_USERNAME` |
 | `iDPw` | repo | `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` (OIDC), `GH_OAUTH_CLIENT_SECRET` | `AAD_CLIENT_ID`, `AAD_FIC_MI_CLIENT_ID`, `GH_OAUTH_CLIENT_ID` |
 | ACA `ca-idpw-backend` | *(Azure, não é repo)* | `gh-app-private-key`, `ghcr-password`, `ravendb-cert` — **propagados pelo ci-cd do iDPw-backend**, não edite na mão | env vars idem |
 
