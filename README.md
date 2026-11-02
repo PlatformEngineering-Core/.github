@@ -135,14 +135,27 @@ A plataforma usa poucos tokens, cada um com o menor escopo possível. Convençã
 
 | Token (GitHub) | Vira secret | Onde | Tipo / owner | Escopos / permissões | Para quê |
 | --- | --- | --- | --- | --- | --- |
-| `PE-APPS-RUNNERS` | `GH_PE_APPS_RUNNERS` | repo gh-runners | fine-grained, owner **Apps** | org Apps: **Self-hosted runners RW** · repos: todos | scaler + registro dos 4 runners de stack |
-| `PE-CORE-RUNNERS` | `GH_PE_CORE_RUNNERS` | repo gh-runners | fine-grained, owner **Core** | org Core: **Self-hosted runners RW** · repos: todos | runner `platform` (fine-grained não atravessa org) |
+| `PE-APPS-RUNNERS` | `GH_PE_APPS_RUNNERS` | repo gh-runners | fine-grained, owner **Apps** | org Apps: **Self-hosted runners RW** · repos: todos, **Actions R** | scaler + registro dos 4 runners de stack |
+| `PE-CORE-RUNNERS` | `GH_PE_CORE_RUNNERS` | repo gh-runners | fine-grained, owner **Core** | org Core: **Self-hosted runners RW** · repos: todos, **Actions R** | runner `platform` (fine-grained não atravessa org) |
 | `PE-CROSS-GHCR` | `GH_PE_CROSS_GHCR` / `ghcr-password` | repos gh-runners, iDPw-backend + ACAs | classic | `read:packages` + `write:packages` | pull/push das imagens no GHCR |
 | `PE-CROSS-TERRAFORM` | `GH_PE_CROSS_TERRAFORM` | environments no platform-enablement | classic | `repo` + `workflow` + `admin:org` + `delete_repo` | criar/deletar repos na org Apps, environments, secrets/vars, FICs, dispatch |
-| `PE-APPS-MIRROR-SYNC` | `GH_TOKEN` | repo gh-actions | fine-grained, owner **Apps** | **Contents RW** + Metadata R · repo: só `gh-actions` | Sync-Mirror (push no mirror Apps/gh-actions) |
+| `PE-APPS-MIRROR-SYNC` | `GH_PE_APPS_MIRROR_SYNC` | repo gh-actions | fine-grained, owner **Apps** | **Contents RW** + Metadata R · repo: só `gh-actions` | Sync-Mirror (push no mirror Apps/gh-actions) |
 | *(GitHub App `iDPw-backend`)* | `GH_APP_ID` + `GH_APP_PRIVATE_KEY` | repo iDPw-backend → ACA | App instalado nas 2 orgs | App: Actions RW, Contents R, Environments R, Secrets R (só metadados), Variables R, Metadata R · instalação Core: só `platform-enablement` · instalação Apps: todos | backend do portal (dispatch na Core + leituras na Apps) — [guia](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md) |
 
 > Detalhes de criação/rotação de cada um: [gh-runners → segurança dos tokens](https://github.com/PlatformEngineering-Core/gh-runners#importante-seguran%C3%A7a-dos-tokens) e [platform-enablement → secrets](https://github.com/PlatformEngineering-Core/platform-enablement#secrets-dos-workflows).
+
+### Secrets por repositório (onde cada uma precisa existir)
+
+| Repositório | Escopo | Secrets | Vars |
+| --- | --- | --- | --- |
+| `platform-enablement` | **Environment por company** (ex: `Mestrado-DEV`) | `AZURE_CREDENTIALS`, `AZURE_STORAGE_ACCOUNT_SAS_TOKEN`, `GH_PE_CROSS_TERRAFORM`, `TF_VAR_SONAR_TOKEN`, `TF_VAR_SNYK_API_KEY`, `TF_VAR_SAFETY_API_KEY`, `TF_VAR_GITLEAKS_LICENSE`, `TF_VAR_OTLP_*` (4, opcionais) | `GH_TARGET_APPS`, `IDPW_BACKEND_PRINCIPAL_ID` (opcional) |
+| `gh-runners` | repo | `AZURE_CREDENTIALS`, `GH_PE_APPS_RUNNERS`, `GH_PE_CORE_RUNNERS`, `GH_PE_CROSS_GHCR` | — |
+| `gh-actions` | repo | `GH_PE_APPS_MIRROR_SYNC` | — |
+| `iDPw-backend` | repo | `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` (OIDC), `GH_PE_CROSS_GHCR`, `GH_APP_PRIVATE_KEY`, `RAVENDB_CERTIFICATE_BASE64` | `GH_APP_ID`, `RAVENDB_URL` (+ defaults opcionais) |
+| `iDPw` | repo | `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` (OIDC), `GH_OAUTH_CLIENT_SECRET` | `AAD_CLIENT_ID`, `AAD_FIC_MI_CLIENT_ID`, `GH_OAUTH_CLIENT_ID` |
+| ACA `ca-idpw-backend` | *(Azure, não é repo)* | `gh-app-private-key`, `ghcr-password`, `ravendb-cert` — **propagados pelo ci-cd do iDPw-backend**, não edite na mão | env vars idem |
+
+> App repos criados pela plataforma (org Apps) recebem os deles via Terraform (módulos `repo-secrets`/`repo-var`) — não cadastre à mão.
 
 - Bootstrap da identidade OIDC do repo: [`scripts/New-OidcIdentity.ps1`](https://github.com/PlatformEngineering-Core/iDPw/blob/main/scripts/New-OidcIdentity.ps1)
 - Registro dos provedores de login, MI/FIC e convites de usuário (role `idp_user`): [iDPw → Acesso](https://github.com/PlatformEngineering-Core/iDPw#acesso)
