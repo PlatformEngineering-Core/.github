@@ -143,10 +143,17 @@ A plataforma usa poucos tokens, cada um com o menor escopo possível. Convençã
 | `PE-CORE-RUNNERS` | `GH_PE_CORE_RUNNERS` | repo gh-runners | fine-grained, owner **Core** | org Core: **Self-hosted runners RW** · repos: todos, **Actions R** | runner `platform` (fine-grained não atravessa org) |
 | `PE-CROSS-GHCR` | `GH_PE_CROSS_GHCR` / `ghcr-password` | repos gh-runners, iDPw-backend + ACAs | classic | `read:packages` + `write:packages` | pull/push das imagens no GHCR |
 | `PE-CROSS-TERRAFORM` | `GH_PE_CROSS_TERRAFORM` | environments no platform-enablement | classic | `repo` + `workflow` + `admin:org` + `delete_repo` | criar/deletar repos na org Apps, environments, secrets/vars, FICs, dispatch |
-| `PE-APPS-MIRROR-SYNC` | `GH_PE_APPS_MIRROR_SYNC` | repo gh-actions | fine-grained, owner **Apps** | **Contents RW** + Metadata R · repo: só `gh-actions` | Sync-Mirror (push no mirror Apps/gh-actions) |
+| `PE-APPS-MIRROR-SYNC` | `GH_PE_APPS_MIRROR_SYNC` | repo gh-actions | fine-grained, owner **Apps** | **Contents RW** + **Workflows RW** (o push toca `.github/workflows` — sem isso o GitHub rejeita) + Metadata R · repo: só `gh-actions` | Sync-Mirror (push no mirror Apps/gh-actions) |
 | *(GitHub App `iDPw-backend`)* | `GH_APP_ID` + `GH_APP_PRIVATE_KEY` | repo iDPw-backend → ACA | App instalado nas 2 orgs | App: Actions RW, Contents R, Environments R, Secrets R (só metadados), Variables R, Metadata R · instalação Core: só `platform-enablement` · instalação Apps: todos | backend do portal (dispatch na Core + leituras na Apps) — [guia](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md) |
 
 > Detalhes de criação/rotação de cada um: [gh-runners → segurança dos tokens](https://github.com/PlatformEngineering-Core/gh-runners#importante-seguran%C3%A7a-dos-tokens) e [platform-enablement → secrets](https://github.com/PlatformEngineering-Core/platform-enablement#secrets-dos-workflows).
+
+**Onde criar cada coisa** (URLs diretas):
+
+- **Fine-grained PAT** (PE-APPS-RUNNERS, PE-CORE-RUNNERS, PE-APPS-MIRROR-SYNC): <https://github.com/settings/personal-access-tokens/new> — campo **Resource owner**: selecione a org (`PlatformEngineering-Apps` ou `PlatformEngineering-Core`). O token é pessoal COM owner na org — por isso pode precisar de aprovação de um owner da org para valer.
+- **Classic PAT** (PE-CROSS-*): <https://github.com/settings/tokens/new> — classic não tem resource owner; escopos conforme a tabela.
+- **Secrets/variables com escopo de ORG** (quando usados): <https://github.com/organizations/PlatformEngineering-Apps/settings/secrets/actions> (e `.../settings/variables/actions`). Hoje a plataforma usa secrets de **repo/environment**, não de org — mas se um dia um token virar org-level, é lá.
+- **GitHub App** (`iDPw-backend`): <https://github.com/organizations/PlatformEngineering-Core/settings/apps> — [guia completo](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md).
 
 ### Secrets por repositório (onde cada uma precisa existir)
 
