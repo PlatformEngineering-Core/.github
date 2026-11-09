@@ -2,11 +2,11 @@
   <img src="../docs/logo.png" alt="Platform Engineering" width="320" />
 </p>
 
-# Platform Engineering — Internal Developer Platform (iDPw)
+# Platform Engineering - Internal Developer Platform (iDPw)
 
 Plataforma de **Platform Engineering** para provisionamento self-service de repositórios e infraestrutura Azure: o desenvolvedor preenche um formulário no portal (**iDPw**) e a plataforma cria o repositório na org `PlatformEngineering-Apps` já com scaffold do framework, CI/CD, projeto SonarCloud, App Registration com OIDC (sem secrets), Resource Groups e o destino de deploy (ACA, AKS, App Service, Functions ou Static Web App).
 
-Este repositório (`.github`) guarda a apresentação e o mapa da plataforma. **A documentação detalhada de cada componente vive no respectivo repositório** — esta página apenas apresenta e aponta.
+Este repositório (`.github`) guarda a apresentação e o mapa da plataforma. **A documentação detalhada de cada componente vive no respectivo repositório** - esta página apenas apresenta e aponta.
 
 ---
 
@@ -14,10 +14,10 @@ Este repositório (`.github`) guarda a apresentação e o mapa da plataforma. **
 
 ```mermaid
 flowchart TB
-    PORTAL[iDPw — portal<br/>dispatch via GitHub API]
-    BACKEND[iDPw-backend — API + scheduler<br/>RavenDB · GitHub App]
+    PORTAL[iDPw - portal<br/>dispatch via GitHub API]
+    BACKEND[iDPw-backend - API + scheduler<br/>RavenDB · GitHub App]
 
-    subgraph GITHUB[GitHub — org PlatformEngineering-Apps]
+    subgraph GITHUB[GitHub - org PlatformEngineering-Apps]
         REPO[Repositório<br/>scaffold + templates de CI/CD]
         LABELS[Labels de issues]
         ENVS[Environments<br/>development, staging, production]
@@ -44,11 +44,11 @@ flowchart TB
             APP --> OIDC
         end
 
-        subgraph CROSS[Shared cross-env — por empresa]
+        subgraph CROSS[Shared cross-env - por empresa]
             ACR[ACR compartilhado<br/>admin desabilitado]
         end
 
-        subgraph SHARED[Shared por ambiente — por área]
+        subgraph SHARED[Shared por ambiente - por área]
             RGS[RG compartilhado]
             ACAE[Container Apps Environment<br/>Consumption]
             LAW[Log Analytics + App Insights]
@@ -63,7 +63,7 @@ flowchart TB
         ROLECONTRIB[Contributor no RG do repo]
     end
 
-    PORTAL -->|workflow_dispatch| TF[Terraform — platform-enablement]
+    PORTAL -->|workflow_dispatch| TF[Terraform - platform-enablement]
     PORTAL -->|REST /api/v1| BACKEND
     BACKEND -->|workflow_dispatch<br/>manage · promote · destroy| TF
     TF --> REPO
@@ -88,11 +88,11 @@ flowchart TB
 
 | Repositório | Papel | Documentação |
 | --- | --- | --- |
-| [iDPw](https://github.com/PlatformEngineering-Core/iDPw) | Portal web (React/Vite em Azure Static Web App) que dispara os workflows de create/destroy/recreate via API do GitHub. Login com GitHub + Microsoft (Easy Auth, role `idp_user`). | [README](https://github.com/PlatformEngineering-Core/iDPw#readme) — setup local, Easy Auth, MI/FIC, convites de usuário, CI/CD |
-| [iDPw-backend](https://github.com/PlatformEngineering-Core/iDPw-backend) | API do portal (.NET 10 + worker de desligamentos no mesmo container, em Azure Container Apps): solicitações e auditoria no RavenDB Cloud, trilha de ambientes (state blobs + GitHub Environments), agendas de desligamento (cron NCrontab), leituras GitHub/KV/AppConfig e o gerenciamento **GitOps** (`POST /manage/*` → `terraform-manage.yml`). Autenticação de máquina via GitHub App (sem PAT). | [README](https://github.com/PlatformEngineering-Core/iDPw-backend#readme) — endpoints, modelo GitOps, fontes de verdade · [docs/GITHUB-APP-SETUP.md](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md) |
-| [platform-enablement](https://github.com/PlatformEngineering-Core/platform-enablement) | Orquestrador: workflows `terraform-create/destroy/recreate` que criam repo, branches, scaffold, SonarCloud, App Registration (OIDC), RGs, ACR compartilhado e infra do deploy target. | [README](https://github.com/PlatformEngineering-Core/platform-enablement#readme) — pré-requisitos, secrets, estrutura dos estados Terraform, infra compartilhada |
-| [gh-actions](https://github.com/PlatformEngineering-Core/gh-actions) | Workflows reutilizáveis e composite actions de build/test/segurança/deploy por stack (.NET, Java, Node, Python, React), chamados pelos repos criados. | [README](https://github.com/PlatformEngineering-Core/gh-actions#readme) — contratos (inputs/secrets) de cada workflow |
-| [gh-runners](https://github.com/PlatformEngineering-Core/gh-runners) | Runners efêmeros self-hosted por stack (`dotnet`, `java`, `node`, `python`) rodando como **Azure Container Apps Jobs** com scale-to-zero via KEDA — mais o runner `platform` (org Core) que executa os próprios workflows do platform-enablement. | [README](https://github.com/PlatformEngineering-Core/gh-runners#readme) e [docs/GITHUB-APP-SETUP.md](https://github.com/PlatformEngineering-Core/gh-runners/blob/main/docs/GITHUB-APP-SETUP.md) |
+| [iDPw](https://github.com/PlatformEngineering-Core/iDPw) | Portal web (React/Vite em Azure Static Web App) que dispara os workflows de create/destroy/recreate via API do GitHub. Login com GitHub + Microsoft (Easy Auth, role `idp_user`). | [README](https://github.com/PlatformEngineering-Core/iDPw#readme) - setup local, Easy Auth, MI/FIC, convites de usuário, CI/CD |
+| [iDPw-backend](https://github.com/PlatformEngineering-Core/iDPw-backend) | API do portal (.NET 10 + worker de desligamentos no mesmo container, em Azure Container Apps): solicitações e auditoria no RavenDB Cloud, trilha de ambientes (state blobs + GitHub Environments), agendas de desligamento (cron NCrontab), leituras GitHub/KV/AppConfig e o gerenciamento **GitOps** (`POST /manage/*` → `terraform-manage.yml`). Autenticação de máquina via GitHub App (sem PAT). | [README](https://github.com/PlatformEngineering-Core/iDPw-backend#readme) - endpoints, modelo GitOps, fontes de verdade · [docs/GITHUB-APP-SETUP.md](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md) |
+| [platform-enablement](https://github.com/PlatformEngineering-Core/platform-enablement) | Orquestrador: workflows `terraform-create/destroy/recreate` que criam repo, branches, scaffold, SonarCloud, App Registration (OIDC), RGs, ACR compartilhado e infra do deploy target. | [README](https://github.com/PlatformEngineering-Core/platform-enablement#readme) - pré-requisitos, secrets, estrutura dos estados Terraform, infra compartilhada |
+| [gh-actions](https://github.com/PlatformEngineering-Core/gh-actions) | Workflows reutilizáveis e composite actions de build/test/segurança/deploy por stack (.NET, Java, Node, Python, React), chamados pelos repos criados. | [README](https://github.com/PlatformEngineering-Core/gh-actions#readme) - contratos (inputs/secrets) de cada workflow |
+| [gh-runners](https://github.com/PlatformEngineering-Core/gh-runners) | Runners efêmeros self-hosted por stack (`dotnet`, `java`, `node`, `python`) rodando como **Azure Container Apps Jobs** com scale-to-zero via KEDA - mais o runner `platform` (org Core) que executa os próprios workflows do platform-enablement. | [README](https://github.com/PlatformEngineering-Core/gh-runners#readme) e [docs/GITHUB-APP-SETUP.md](https://github.com/PlatformEngineering-Core/gh-runners/blob/main/docs/GITHUB-APP-SETUP.md) |
 
 ---
 
@@ -131,7 +131,7 @@ Secrets por empresa (GitHub Environment), incluindo `AZURE_CREDENTIALS`, SAS tok
 
 ### 5. iDPw (portal)
 
-O portal tem identidade OIDC própria e autenticação de usuários via Easy Auth — ambos **sem secrets de longa duração** (Managed Identity + FIC para o provedor Microsoft; o único secret real é o do GitHub OAuth App).
+O portal tem identidade OIDC própria e autenticação de usuários via Easy Auth - ambos **sem secrets de longa duração** (Managed Identity + FIC para o provedor Microsoft; o único secret real é o do GitHub OAuth App).
 
 ### Mapa de tokens (GitHub PATs)
 
@@ -143,30 +143,30 @@ A plataforma usa poucos tokens, cada um com o menor escopo possível. Convençã
 | `PE-CORE-RUNNERS` | `GH_PE_CORE_RUNNERS` | repo gh-runners | fine-grained, owner **Core** | org Core: **Self-hosted runners RW** · repos: todos, **Actions R** | runner `platform` (fine-grained não atravessa org) |
 | `PE-CROSS-GHCR` | `GH_PE_CROSS_GHCR` / `ghcr-password` | repos gh-runners, iDPw-backend + ACAs | classic | `read:packages` + `write:packages` | pull/push das imagens no GHCR |
 | `PE-CROSS-TERRAFORM` | `GH_PE_CROSS_TERRAFORM` | environments no platform-enablement | classic | `repo` + `workflow` + `admin:org` + `delete_repo` | criar/deletar repos na org Apps, environments, secrets/vars, FICs, dispatch |
-| `PE-APPS-MIRROR-SYNC` | `GH_PE_APPS_MIRROR_SYNC` | repo gh-actions | fine-grained, owner **Apps** | **Contents RW** + **Workflows RW** (o push toca `.github/workflows` — sem isso o GitHub rejeita) + Metadata R · repo: só `gh-actions` | Sync-Mirror (push no mirror Apps/gh-actions) |
-| *(GitHub App `iDPw-backend`)* | `GH_APP_ID` + `GH_APP_PRIVATE_KEY` | repo iDPw-backend → ACA | App instalado nas 2 orgs | App: Actions RW, Contents R, Environments R, Secrets R (só metadados), Variables R, Metadata R · instalação Core: só `platform-enablement` · instalação Apps: todos | backend do portal (dispatch na Core + leituras na Apps) — [guia](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md) |
+| `PE-APPS-MIRROR-SYNC` | `GH_PE_APPS_MIRROR_SYNC` | repo gh-actions | fine-grained, owner **Apps** | **Contents RW** + **Workflows RW** (o push toca `.github/workflows` - sem isso o GitHub rejeita) + Metadata R · repo: só `gh-actions` | Sync-Mirror (push no mirror Apps/gh-actions) |
+| *(GitHub App `iDPw-backend`)* | `GH_APP_ID` + `GH_APP_PRIVATE_KEY` | repo iDPw-backend → ACA | App instalado nas 2 orgs | App: Actions RW, Contents R, Environments R, Secrets R (só metadados), Variables R, Metadata R · instalação Core: só `platform-enablement` · instalação Apps: todos | backend do portal (dispatch na Core + leituras na Apps) - [guia](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md) |
 
 > Detalhes de criação/rotação de cada um: [gh-runners → segurança dos tokens](https://github.com/PlatformEngineering-Core/gh-runners#importante-seguran%C3%A7a-dos-tokens) e [platform-enablement → secrets](https://github.com/PlatformEngineering-Core/platform-enablement#secrets-dos-workflows).
 
 **Onde criar cada coisa** (URLs diretas):
 
-- **Fine-grained PAT** (PE-APPS-RUNNERS, PE-CORE-RUNNERS, PE-APPS-MIRROR-SYNC): <https://github.com/settings/personal-access-tokens/new> — campo **Resource owner**: selecione a org (`PlatformEngineering-Apps` ou `PlatformEngineering-Core`). O token é pessoal COM owner na org — por isso pode precisar de aprovação de um owner da org para valer.
-- **Classic PAT** (PE-CROSS-*): <https://github.com/settings/tokens/new> — classic não tem resource owner; escopos conforme a tabela.
-- **Secrets/variables com escopo de ORG** (quando usados): <https://github.com/organizations/PlatformEngineering-Apps/settings/secrets/actions> (e `.../settings/variables/actions`). Hoje a plataforma usa secrets de **repo/environment**, não de org — mas se um dia um token virar org-level, é lá.
-- **GitHub App** (`iDPw-backend`): <https://github.com/organizations/PlatformEngineering-Core/settings/apps> — [guia completo](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md).
+- **Fine-grained PAT** (PE-APPS-RUNNERS, PE-CORE-RUNNERS, PE-APPS-MIRROR-SYNC): <https://github.com/settings/personal-access-tokens/new> - campo **Resource owner**: selecione a org (`PlatformEngineering-Apps` ou `PlatformEngineering-Core`). O token é pessoal COM owner na org - por isso pode precisar de aprovação de um owner da org para valer.
+- **Classic PAT** (PE-CROSS-*): <https://github.com/settings/tokens/new> - classic não tem resource owner; escopos conforme a tabela.
+- **Secrets/variables com escopo de ORG** (quando usados): <https://github.com/organizations/PlatformEngineering-Apps/settings/secrets/actions> (e `.../settings/variables/actions`). Hoje a plataforma usa secrets de **repo/environment**, não de org - mas se um dia um token virar org-level, é lá.
+- **GitHub App** (`iDPw-backend`): <https://github.com/organizations/PlatformEngineering-Core/settings/apps> - [guia completo](https://github.com/PlatformEngineering-Core/iDPw-backend/blob/main/docs/GITHUB-APP-SETUP.md).
 
 ### Secrets por repositório (onde cada uma precisa existir)
 
 | Repositório | Escopo | Secrets | Vars |
 | --- | --- | --- | --- |
 | `platform-enablement` | **Environment por company** (ex: `Mestrado-DEV`) | `AZURE_CREDENTIALS`, `AZURE_STORAGE_ACCOUNT_SAS_TOKEN`, `GH_PE_CROSS_TERRAFORM`, `TF_VAR_SONAR_TOKEN`, `TF_VAR_SNYK_API_KEY`, `TF_VAR_SAFETY_API_KEY`, `TF_VAR_GITLEAKS_LICENSE`, `TF_VAR_OTLP_*` (4, opcionais) | env: `GH_TARGET_APPS`, `IDPW_BACKEND_PRINCIPAL_ID` (opcional) · repo: `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_STORAGE_CONTAINER_NAME` |
-| `gh-runners` | repo | `AZURE_CREDENTIALS`, `GH_PE_APPS_RUNNERS`, `GH_PE_CORE_RUNNERS`, `GH_PE_CROSS_GHCR` | — |
-| `gh-actions` | repo | `GH_PE_APPS_MIRROR_SYNC` | — |
+| `gh-runners` | repo | `AZURE_CREDENTIALS`, `GH_PE_APPS_RUNNERS`, `GH_PE_CORE_RUNNERS`, `GH_PE_CROSS_GHCR` | - |
+| `gh-actions` | repo | `GH_PE_APPS_MIRROR_SYNC` | - |
 | `iDPw-backend` | repo | `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` (OIDC), `GH_PE_CROSS_GHCR`, `GH_APP_PRIVATE_KEY`, `RAVENDB_CERTIFICATE_BASE64` | obrigatórias: `GH_APP_ID`, `RAVENDB_URL`, `RAVENDB_DATABASE`, `GH_PLATFORM_REPO`, `GH_APPS_ORG`, `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_STORAGE_CONTAINER_NAME`, `AZURE_RESOURCE_GROUP`, `AZURE_ACA_ENVIRONMENT`, `AZURE_CONTAINERAPP_NAME`, `AZURE_LOCATION` · opcional: `GHCR_USERNAME` |
 | `iDPw` | repo | `AZURE_CLIENT_ID` / `AZURE_TENANT_ID` / `AZURE_SUBSCRIPTION_ID` (OIDC), `GH_OAUTH_CLIENT_SECRET` | `AAD_CLIENT_ID`, `AAD_FIC_MI_CLIENT_ID`, `GH_OAUTH_CLIENT_ID` |
-| ACA `ca-idpw-backend` | *(Azure, não é repo)* | `gh-app-private-key`, `ghcr-password`, `ravendb-cert` — **propagados pelo ci-cd do iDPw-backend**, não edite na mão | env vars idem |
+| ACA `ca-idpw-backend` | *(Azure, não é repo)* | `gh-app-private-key`, `ghcr-password`, `ravendb-cert` - **propagados pelo ci-cd do iDPw-backend**, não edite na mão | env vars idem |
 
-> App repos criados pela plataforma (org Apps) recebem os deles via Terraform (módulos `repo-secrets`/`repo-var`) — não cadastre à mão.
+> App repos criados pela plataforma (org Apps) recebem os deles via Terraform (módulos `repo-secrets`/`repo-var`) - não cadastre à mão.
 
 - Bootstrap da identidade OIDC do repo: [`scripts/New-OidcIdentity.ps1`](https://github.com/PlatformEngineering-Core/iDPw/blob/main/scripts/New-OidcIdentity.ps1)
 - Registro dos provedores de login, MI/FIC e convites de usuário (role `idp_user`): [iDPw → Acesso](https://github.com/PlatformEngineering-Core/iDPw#acesso)
@@ -179,4 +179,4 @@ A plataforma usa poucos tokens, cada um com o menor escopo possível. Convençã
 - **Sem credenciais de longa duração**: GitHub Actions → Azure via OIDC com Federated Identity Credentials imutáveis (`org@ID`/`repo@ID`); SWA → Entra via Managed Identity + FIC; ACA → ACR via admin user do registry (credencial estática, sem Managed Identity). Explicação completa: [iDPw → O que são MI e FIC](https://github.com/PlatformEngineering-Core/iDPw#o-que-s%C3%A3o-mi-e-fic-e-por-que-n%C3%A3o-h%C3%A1-client-secret).
 - **ACR é o único container registry**: um ACR compartilhado **por empresa** (criado no job `terraform-azure-shared-cross-infra`), com build remoto via `az acr build` (sem Docker daemon no runner).
 - **Infra compartilhada em dois níveis**: cross-env (ACR, por empresa) e por ambiente (RG/Logs/ACAE/Key Vault, por área + `-dev`/`-hom`/prd). Detalhes: [platform-enablement → Infraestrutura compartilhada](https://github.com/PlatformEngineering-Core/platform-enablement#infraestrutura-compartilhada-por-%C3%A1rea-iac-shared-e-iac-shared-cross).
-- **Rastreabilidade**: toda solicitação do portal gera um `control_id` (`REQ-AAAAMMDD-XXXXXXXX`) que aparece no nome da execução do workflow — [iDPw → Rastreamento](https://github.com/PlatformEngineering-Core/iDPw#rastreamento-das-solicita%C3%A7%C3%B5es).
+- **Rastreabilidade**: toda solicitação do portal gera um `control_id` (`REQ-AAAAMMDD-XXXXXXXX`) que aparece no nome da execução do workflow - [iDPw → Rastreamento](https://github.com/PlatformEngineering-Core/iDPw#rastreamento-das-solicita%C3%A7%C3%B5es).
