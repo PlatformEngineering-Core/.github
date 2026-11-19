@@ -92,42 +92,20 @@ flowchart TB
 
 ---
 
-## Base necessária (ordem de setup)
+## Setup do zero
 
-Tudo que precisa existir **antes** de a plataforma provisionar o primeiro repositório. Cada item aponta para a doc que tem o passo a passo completo.
+O [guia de setup do zero](docs/SETUP-DO-ZERO.md) organiza a montagem completa da
+plataforma, com dependencias, ordem de publicacao/deploy e criterios de aceite:
 
-### 1. Service Principal da automação (Entra ID)
+**Base externa e Azure → gh-actions e templates → gh-runners → platform-enablement
+→ OTel-Collector → RavenDB e iDPw-backend → iDPw → aplicacao piloto.**
 
-Identidade que os workflows do `platform-enablement` usam para criar RGs, App Registrations e atribuir roles no Azure.
-
-- Script: [`scripts/01-New-TerraformInfrastructureServicePrincipal.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/01-New-TerraformInfrastructureServicePrincipal.ps1)
-- Detalhes: [platform-enablement → Pré-requisitos §1](https://github.com/PlatformEngineering-Core/platform-enablement#1-service-principal-no-microsoft-entra-id)
-
-### 2. Storage Account para os estados do Terraform
-
-Todos os `tfstate` e tfplans ficam em blobs de um Storage Account (por repo e por infra compartilhada), container `projects-states`. O nome da conta está no `env.STORAGE_ACCOUNT_NAME` dos workflows.
-
-- Criação da conta, container e SAS token: [platform-enablement → §2 Storage Account](https://github.com/PlatformEngineering-Core/platform-enablement#2-storage-account-para-estado-do-terraform)
-- Estrutura de blobs esperada: mesma seção da doc acima.
-
-### 3. Runners self-hosted (Azure Container Apps Jobs)
-
-Os pipelines de build/deploy dos repos criados rodam em runners efêmeros (`runs-on: [self-hosted, <stack>]`), escalados do zero pelo KEDA a cada webhook do GitHub. Os próprios workflows de provisionamento (platform-enablement) rodam no runner `platform`, registrado na org Core.
-
-- Setup do GitHub App e dos Jobs: [gh-runners → docs/GITHUB-APP-SETUP.md](https://github.com/PlatformEngineering-Core/gh-runners/blob/main/docs/GITHUB-APP-SETUP.md)
-- Arquitetura e entrypoint: [gh-runners → README](https://github.com/PlatformEngineering-Core/gh-runners#readme)
-
-### 4. Secrets e Environments do platform-enablement
-
-Secrets por empresa (GitHub Environment), incluindo `AZURE_CREDENTIALS`, SAS token do storage, PAT com escopo de criação de repos (`GH_PE_CROSS_TERRAFORM`) e tokens SonarCloud/Gitleaks/etc.
-
-- Script interativo: [`scripts/02-New-EnvAndSecretsByCompany.ps1`](https://github.com/PlatformEngineering-Core/platform-enablement/blob/main/scripts/02-New-EnvAndSecretsByCompany.ps1)
-- Tabela completa de secrets: [platform-enablement → Secrets dos workflows](https://github.com/PlatformEngineering-Core/platform-enablement#secrets-dos-workflows)
-- Copiar um environment inteiro (regras, variables e secrets) para outro nome: workflow **Copy GitHub Environment** (`copy-environment.yml`) no platform-enablement.
-
-### 5. iDPw (portal)
-
-O portal tem identidade OIDC própria e autenticação de usuários via Easy Auth - ambos **sem secrets de longa duração** (Managed Identity + FIC para o provedor Microsoft; o único secret real é o do GitHub OAuth App).
+O guia separa a infraestrutura central, que precisa existir antes dos runners,
+da infraestrutura das aplicacoes, criada pelo primeiro `terraform-create`.
+Inclui tambem mirror Apps, autenticacao, persistencia, telemetria e integracao
+do portal com o backend. Para uma instalacao nova, siga o guia completo e os
+contratos atuais dos componentes. O inventario de credenciais abaixo e uma
+referencia complementar, nao uma segunda sequencia de instalacao.
 
 ### Mapa de tokens (GitHub PATs)
 
